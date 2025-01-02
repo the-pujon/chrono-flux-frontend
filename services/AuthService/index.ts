@@ -6,7 +6,7 @@ import { jwtDecode } from "jwt-decode";
 import axiosInstance from "@/lib/AxiosInstance";
 
 
-export const registerUser = async (userData: FieldValues) => {
+export const signupUser = async (userData: FieldValues) => {
   try {
     const { data } = await axiosInstance.post("/auth/signup", userData);
 
@@ -20,9 +20,10 @@ export const registerUser = async (userData: FieldValues) => {
 export const loginUser = async (userData: FieldValues) => {
   try {
     const { data } = await axiosInstance.post("/auth/login", userData);
+    // console.log(data.data)
 
     if (data.success) {
-      cookies().set("accessToken", data?.accessToken);
+      cookies().set("accessToken", data?.data?.accessToken);
     }
 
     return data;

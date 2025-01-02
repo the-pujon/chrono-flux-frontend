@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,6 +9,8 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { Lock, Mail } from 'lucide-react'
+import { useUserLogin } from '@/hooks/auth.hook'
+import { toast } from 'sonner'
 
 type FormData = {
   email: string;
@@ -20,10 +22,29 @@ export default function LoginPage() {
     mode: "onChange"
   })
 
+  const { mutate: handleUserLogin,  isLoading } = useUserLogin();
+
   const onSubmit = (data: FormData) => {
     console.log(data)
+    handleUserLogin(data)
     // Here you would typically handle the login logic
   }
+  
+
+  const toastIdRef = useRef<string | number | null>(null)
+
+  useEffect(() => {
+    if (isLoading && !toastIdRef.current) {
+      toastIdRef.current = toast.loading('Creating your account...')
+    }
+
+    return () => {
+      if (toastIdRef.current) {
+        toast.dismiss(toastIdRef.current)
+        toastIdRef.current = null
+      }
+    }
+  }, [isLoading])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 to-indigo-200 flex flex-col items-center justify-center p-4">

@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,6 +9,9 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { Lock, Mail, User } from 'lucide-react'
+import { useUserSignup } from '@/hooks/auth.hook'
+import { toast } from 'sonner'
+// import { useRouter } from 'next/navigation'
 
 type FormData = {
   name: string;
@@ -22,10 +25,35 @@ export default function SignUpPage() {
     mode: "onChange"
   })
 
+  const { mutate: handleUserSignup,  isLoading } = useUserSignup();
+//   const router = useRouter();
+
+
   const onSubmit = (data: FormData) => {
-    console.log(data)
-    // Here you would typically handle the signup logic
+    const dataWithoutConfirmPassword = {
+      name: data.name,
+      email: data.email,
+      password: data.password,
+    }
+    handleUserSignup(dataWithoutConfirmPassword)
   }
+
+
+  const toastIdRef = useRef<string | number | null>(null)
+
+  useEffect(() => {
+    if (isLoading && !toastIdRef.current) {
+      toastIdRef.current = toast.loading('Creating your account...')
+    }
+
+    return () => {
+      if (toastIdRef.current) {
+        toast.dismiss(toastIdRef.current)
+        toastIdRef.current = null
+      }
+    }
+  }, [isLoading])
+
 
   const password = watch("password")
 
