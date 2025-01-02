@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import focusTrackerReducer from './focusTrackerSlice';
+import focusTrackerReducer from './features/focusTracker/focusTrackerSlice';
 
 const store = configureStore({
   reducer: {

@@ -1,8 +1,7 @@
 'use client'
 
 import React from 'react';
-import { Provider } from 'react-redux';
-import store from '../store/store';
+// import store from '../store/store';
 import { PomodoroTimer } from '../components/PomodoroTimer';
 import { DailyFocusDashboard } from '../components/DailyFocusDashboard';
 import { WeeklyMonthlyFocusDashboard } from '../components/WeeklyMonthlyFocusDashboard';
@@ -13,7 +12,7 @@ import { motion } from 'framer-motion';
 
 export default function Home() {
   return (
-    <Provider store={store}>
+
       <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950">
         <motion.div
           className="container mx-auto py-8 px-4 pt-16 pb-20"
@@ -48,7 +47,7 @@ export default function Home() {
         <UserChatHead />
         <TaskChatHead />
       </main>
-    </Provider>
+
   );
 }
 

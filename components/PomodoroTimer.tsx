@@ -6,10 +6,11 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { incrementSession, resetContinuousSessionStreak, setPauseStartTime, checkPauseAndUpdateStreak } from '../store/focusTrackerSlice';
-import { RootState } from '../store/store';
+import { incrementSession, resetContinuousSessionStreak, setPauseStartTime, checkPauseAndUpdateStreak } from '@/redux/features/focusTracker/focusTrackerSlice';
+// import { RootState } from '../store/store';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Edit2, Play, Pause, RotateCcw, Clock, Coffee, Zap } from 'lucide-react';
+import { RootState } from '@/redux/store';
 
 export const PomodoroTimer: React.FC = () => {
   const [showTimer, setShowTimer] = useState(false);
