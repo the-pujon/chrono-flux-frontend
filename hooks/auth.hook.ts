@@ -29,7 +29,7 @@ export const useUserLogin = () => {
     mutationFn: async (userData) => await loginUser(userData),
     onSuccess: () => {
       toast.success("User login successful.");
-    //   router.push("/");
+      router.push("/");
     },
     onError: (error) => {
       toast.error(error.message);

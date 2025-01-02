@@ -46,13 +46,10 @@ export const getCurrentUser = async () => {
     decodedToken = await jwtDecode(accessToken);
 
     return {
-      _id: decodedToken._id,
+      id: decodedToken.id,
       name: decodedToken.name,
       email: decodedToken.email,
-      mobileNumber: decodedToken.mobileNumber,
       role: decodedToken.role,
-      status: decodedToken.status,
-      profilePhoto: decodedToken.profilePhoto,
     };
   }
 
