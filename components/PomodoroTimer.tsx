@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -15,16 +14,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import {
-  incrementSession,
-  resetContinuousSessionStreak,
-  // setPauseStartTime,
-  // checkPauseAndUpdateStreak,
-} from "@/redux/features/focusTracker/focusTrackerSlice";
-// import { RootState } from '../store/store';
+
 import { motion, AnimatePresence } from "framer-motion";
 import { Edit2, Play, Pause, RotateCcw, Coffee, Zap } from "lucide-react";
-import { RootState } from "@/redux/store";
 import {
   useCreateFocusSession,
   useGetActiveFocusSession,
@@ -43,16 +35,13 @@ export const PomodoroTimer: React.FC = () => {
   const [customFocusTime, setCustomFocusTime] = useState(25);
   const [customBreakTime, setCustomBreakTime] = useState(5);
 
-  const dispatch = useDispatch();
-  const { currentSession, continuousSessionStreak } =
-    useSelector((state: RootState) => state.focusTracker);
+
+
   const { mutate: createFocusSession } = useCreateFocusSession();
   const { data: activeFocusSession } = useGetActiveFocusSession();
   const { mutate: updateFocusSessionStatus } = useUpdateFocusSessionStatus();
   const { mutate: startFocusSession } = useStartFocusSession();
   const { mutate: updateFocusSession } = useUpdateFocusSession();
-
-  console.log(activeFocusSession);
 
   useEffect(() => {
     if (activeFocusSession?.data) {
@@ -73,11 +62,12 @@ export const PomodoroTimer: React.FC = () => {
       }, 1000);
     } else if (time === 0 && isActive) {
       if (!isBreak) {
-        dispatch(incrementSession(customFocusTime));
+  
         setIsBreak(true);
         setTime(activeFocusSession?.data?.breakTime || customBreakTime * 60);
       } else {
         updateFocusSessionStatus({ status: "finished" });
+        // updateFocusStreak({})
         setIsActive(false);
         setIsBreak(false);
         setTime(activeFocusSession?.data?.sessionTime || customFocusTime * 60);
@@ -91,7 +81,6 @@ export const PomodoroTimer: React.FC = () => {
     isActive,
     time,
     isBreak,
-    dispatch,
     customFocusTime,
     customBreakTime,
     activeFocusSession,
@@ -99,7 +88,6 @@ export const PomodoroTimer: React.FC = () => {
   ]);
 
   const toggleTimer = () => {
-    // if (!activeFocusSession?.data) return;
 
     if (isActive) {
       setShowPauseDialog(true);
@@ -120,7 +108,6 @@ export const PomodoroTimer: React.FC = () => {
         }
       });
       }
-      // dispatch(checkPauseAndUpdateStreak());
       setIsActive(true);
     }
   };
@@ -141,7 +128,6 @@ export const PomodoroTimer: React.FC = () => {
     setIsActive(false);
     setIsBreak(false);
     setTime(activeFocusSession?.data?.sessionTime || customFocusTime * 60);
-    dispatch(resetContinuousSessionStreak());
     setShowResetDialog(false);
   };
 
@@ -480,55 +466,7 @@ export const PomodoroTimer: React.FC = () => {
                 
                 </motion.div>
               </div>
-              <motion.div
-                className="space-y-2 text-center"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.5 }}
-              >
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={currentSession}
-                    className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg"
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 20 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <p className="text-lg font-semibold text-indigo-700 dark:text-indigo-300">
-                      Completed Sessions: {currentSession}
-                    </p>
-                  </motion.div>
-                </AnimatePresence>
-                <AnimatePresence mode="wait">
-                  {/* <motion.div
-                    key={dailyUseStreak}
-                    className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg"
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 20 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <p className="text-lg font-semibold text-indigo-700 dark:text-indigo-300">
-                      Daily Streak: {dailyUseStreak} days
-                    </p>
-                  </motion.div> */}
-                </AnimatePresence>
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={continuousSessionStreak}
-                    className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg"
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 20 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <p className="text-lg font-semibold text-indigo-700 dark:text-indigo-300">
-                      Continuous Sessions: {continuousSessionStreak}
-                    </p>
-                  </motion.div>
-                </AnimatePresence>
-              </motion.div>
+          
             </motion.div>
           )}
         </AnimatePresence>

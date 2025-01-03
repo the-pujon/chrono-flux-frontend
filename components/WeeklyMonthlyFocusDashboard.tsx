@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -49,6 +49,7 @@ export const WeeklyMonthlyFocusDashboard: React.FC = () => {
   };
   
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const renderChart = (data: any[]) => (
     <motion.div
       className="h-64"
