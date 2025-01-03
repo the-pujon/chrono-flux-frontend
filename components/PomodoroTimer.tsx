@@ -1,17 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { incrementSession, resetContinuousSessionStreak, setPauseStartTime, checkPauseAndUpdateStreak } from '@/redux/features/focusTracker/focusTrackerSlice';
+import {
+  incrementSession,
+  resetContinuousSessionStreak,
+  setPauseStartTime,
+  checkPauseAndUpdateStreak,
+} from "@/redux/features/focusTracker/focusTrackerSlice";
 // import { RootState } from '../store/store';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Edit2, Play, Pause, RotateCcw, Coffee, Zap } from 'lucide-react';
-import { RootState } from '@/redux/store';
-import { useCreateFocusSession, useGetActiveFocusSession, useStartFocusSession, useUpdateFocusSessionStatus } from '@/hooks/focusSessionService.hook';
+import { motion, AnimatePresence } from "framer-motion";
+import { Edit2, Play, Pause, RotateCcw, Coffee, Zap } from "lucide-react";
+import { RootState } from "@/redux/store";
+import {
+  useCreateFocusSession,
+  useGetActiveFocusSession,
+  useStartFocusSession,
+  useUpdateFocusSession,
+  useUpdateFocusSessionStatus,
+} from "@/hooks/focusSessionService.hook";
 
 export const PomodoroTimer: React.FC = () => {
   const [showTimer, setShowTimer] = useState(false);
@@ -22,16 +42,17 @@ export const PomodoroTimer: React.FC = () => {
   const [showPauseDialog, setShowPauseDialog] = useState(false);
   const [customFocusTime, setCustomFocusTime] = useState(25);
   const [customBreakTime, setCustomBreakTime] = useState(5);
-  
+
   const dispatch = useDispatch();
-  const { currentSession, dailyUseStreak, continuousSessionStreak } = useSelector((state: RootState) => state.focusTracker);
+  const { currentSession, dailyUseStreak, continuousSessionStreak } =
+    useSelector((state: RootState) => state.focusTracker);
   const { mutate: createFocusSession } = useCreateFocusSession();
   const { data: activeFocusSession } = useGetActiveFocusSession();
   const { mutate: updateFocusSessionStatus } = useUpdateFocusSessionStatus();
   const { mutate: startFocusSession } = useStartFocusSession();
+  const { mutate: updateFocusSession } = useUpdateFocusSession();
 
   console.log(activeFocusSession);
-  
 
   useEffect(() => {
     if (activeFocusSession?.data) {
@@ -39,7 +60,7 @@ export const PomodoroTimer: React.FC = () => {
       setCustomFocusTime(Math.floor(activeFocusSession.data.pausedTime / 60));
       setCustomBreakTime(Math.floor(activeFocusSession.data.breakTime / 60));
       setShowTimer(true);
-      setIsActive(activeFocusSession.data.status === 'inprogress');
+      setIsActive(activeFocusSession.data.status === "inprogress");
     }
   }, [activeFocusSession]);
 
@@ -56,7 +77,7 @@ export const PomodoroTimer: React.FC = () => {
         setIsBreak(true);
         setTime(activeFocusSession?.data?.breakTime || customBreakTime * 60);
       } else {
-        updateFocusSessionStatus({ status: 'finished' });
+        updateFocusSessionStatus({ status: "finished" });
         setIsActive(false);
         setIsBreak(false);
         setTime(activeFocusSession?.data?.sessionTime || customFocusTime * 60);
@@ -66,27 +87,54 @@ export const PomodoroTimer: React.FC = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isActive, time, isBreak, dispatch, customFocusTime, customBreakTime, activeFocusSession, updateFocusSessionStatus]);
+  }, [
+    isActive,
+    time,
+    isBreak,
+    dispatch,
+    customFocusTime,
+    customBreakTime,
+    activeFocusSession,
+    updateFocusSessionStatus,
+  ]);
 
   const toggleTimer = () => {
-    if (!activeFocusSession?.data) return;
+    // if (!activeFocusSession?.data) return;
 
     if (isActive) {
       setShowPauseDialog(true);
     } else {
-     
-      if (activeFocusSession.data.status === 'paused') {
-        updateFocusSessionStatus({ status: 'inprogress' });
-    } else if (activeFocusSession.data.status === 'active') {
+      if (activeFocusSession.data?.status === "paused") {
+        updateFocusSessionStatus({ status: "inprogress" });
+      } else if (activeFocusSession.data?.status === "active") {
         startFocusSession({ id: activeFocusSession.data.id });
-    }
+      }else if(activeFocusSession?.data === null){
+      //   console.log('here')
+      //  const result = createFocusSession({
+      //     sessionTime: customFocusTime * 60,
+      //     breakTime: customBreakTime * 60,
+      //   });
+
+      //   console.log("result", result);
+      //   startFocusSession({ id: createFocusSession.data.id });
+      createFocusSession({
+        sessionTime: customFocusTime * 60,
+        breakTime: customBreakTime * 60,
+      }, {
+        onSuccess: (data) => {
+          startFocusSession({ id: data.id });
+          setShowTimer(true);
+          setTime(customFocusTime * 60);
+        }
+      });
+      }
       dispatch(checkPauseAndUpdateStreak());
       setIsActive(true);
     }
   };
 
   const handlePause = () => {
-    updateFocusSessionStatus({ status: 'paused' });
+    updateFocusSessionStatus({ status: "paused" });
     setIsActive(false);
     dispatch(setPauseStartTime(Date.now()));
     setShowPauseDialog(false);
@@ -97,7 +145,7 @@ export const PomodoroTimer: React.FC = () => {
   };
 
   const confirmReset = () => {
-    updateFocusSessionStatus({ status: 'unfinished' });
+    updateFocusSessionStatus({ status: "unfinished" });
     setIsActive(false);
     setIsBreak(false);
     setTime(activeFocusSession?.data?.sessionTime || customFocusTime * 60);
@@ -111,8 +159,12 @@ export const PomodoroTimer: React.FC = () => {
     const minutes = Math.floor((seconds % 3600) / 60);
     const remainingSeconds = seconds % 60;
     return hours > 0
-      ? `${hours}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
-      : `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+      ? `${hours}:${minutes.toString().padStart(2, "0")}:${remainingSeconds
+          .toString()
+          .padStart(2, "0")}`
+      : `${minutes.toString().padStart(2, "0")}:${remainingSeconds
+          .toString()
+          .padStart(2, "0")}`;
   };
   // const formatTime = (seconds: number): string => {
   //   const hours = Math.floor(seconds / 3600);
@@ -123,17 +175,38 @@ export const PomodoroTimer: React.FC = () => {
   //     : `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   // };
 
-  const percentage = isNaN(time) || isNaN(isBreak ? activeFocusSession?.data?.breakTime || customBreakTime * 60 : activeFocusSession?.data?.sessionTime || customFocusTime * 60) ? 
-    0 : 
-    ((isBreak ? activeFocusSession?.data?.breakTime || customBreakTime * 60 - time : activeFocusSession?.data?.sessionTime || customFocusTime * 60 - time) / 
-    (isBreak ? activeFocusSession?.data?.breakTime || customBreakTime * 60 : activeFocusSession?.data?.sessionTime || customFocusTime * 60)) * 100;
+  const percentage =
+    isNaN(time) ||
+    isNaN(
+      isBreak
+        ? activeFocusSession?.data?.breakTime || customBreakTime * 60
+        : activeFocusSession?.data?.sessionTime || customFocusTime * 60
+    )
+      ? 0
+      : ((isBreak
+          ? activeFocusSession?.data?.breakTime || customBreakTime * 60 - time
+          : activeFocusSession?.data?.sessionTime ||
+            customFocusTime * 60 - time) /
+          (isBreak
+            ? activeFocusSession?.data?.breakTime || customBreakTime * 60
+            : activeFocusSession?.data?.sessionTime || customFocusTime * 60)) *
+        100;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createFocusSession({
-      sessionTime: customFocusTime * 60,
-      breakTime: customBreakTime * 60,
-    });
+    if (activeFocusSession?.data?.status === "active" ) {
+      updateFocusSession({
+        sessionTime: customFocusTime * 60,
+        breakTime: customBreakTime * 60,
+      });
+    
+    }
+    else{
+      createFocusSession({
+        sessionTime: customFocusTime * 60,
+        breakTime: customBreakTime * 60,
+      });
+    }
     setTime(customFocusTime * 60);
     setShowTimer(true);
     setIsActive(false);
@@ -163,7 +236,11 @@ export const PomodoroTimer: React.FC = () => {
     <Card className="w-full bg-white dark:bg-gray-800 shadow-lg overflow-hidden rounded-xl">
       <CardHeader className="bg-indigo-600 dark:bg-indigo-800 text-white p-6">
         <CardTitle className="text-3xl font-bold text-center">
-          {showTimer ? (isBreak ? 'Recharge Time' : 'Focus Session') : 'Pomodoro Focus Timer'}
+          {showTimer
+            ? isBreak
+              ? "Recharge Time"
+              : "Focus Session"
+            : "Pomodoro Focus Timer"}
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6">
@@ -181,8 +258,15 @@ export const PomodoroTimer: React.FC = () => {
             >
               <div className="space-y-6">
                 <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
-                  <Label htmlFor="focusTime" className="text-lg font-semibold text-indigo-700 dark:text-indigo-300">Focus Duration</Label>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Set your ideal focus time (1-180 minutes)</p>
+                  <Label
+                    htmlFor="focusTime"
+                    className="text-lg font-semibold text-indigo-700 dark:text-indigo-300"
+                  >
+                    Focus Duration
+                  </Label>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    Set your ideal focus time (1-180 minutes)
+                  </p>
                   <div className="flex items-center space-x-4 mt-2">
                     <Slider
                       id="focusTime"
@@ -198,7 +282,9 @@ export const PomodoroTimer: React.FC = () => {
                       value={customFocusTime}
                       onChange={(e) => {
                         const value = parseInt(e.target.value);
-                        setCustomFocusTime(isNaN(value) ? 1 : Math.max(1, Math.min(180, value)));
+                        setCustomFocusTime(
+                          isNaN(value) ? 1 : Math.max(1, Math.min(180, value))
+                        );
                       }}
                       className="w-20 text-center"
                       min="1"
@@ -208,8 +294,15 @@ export const PomodoroTimer: React.FC = () => {
                   </div>
                 </div>
                 <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
-                  <Label htmlFor="breakTime" className="text-lg font-semibold text-indigo-700 dark:text-indigo-300">Break Duration</Label>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Set your ideal break time (1-60 minutes)</p>
+                  <Label
+                    htmlFor="breakTime"
+                    className="text-lg font-semibold text-indigo-700 dark:text-indigo-300"
+                  >
+                    Break Duration
+                  </Label>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    Set your ideal break time (1-60 minutes)
+                  </p>
                   <div className="flex items-center space-x-4 mt-2">
                     <Slider
                       id="breakTime"
@@ -225,7 +318,9 @@ export const PomodoroTimer: React.FC = () => {
                       value={customBreakTime}
                       onChange={(e) => {
                         const value = parseInt(e.target.value);
-                        setCustomBreakTime(isNaN(value) ? 1 : Math.max(1, Math.min(60, value)));
+                        setCustomBreakTime(
+                          isNaN(value) ? 1 : Math.max(1, Math.min(60, value))
+                        );
                       }}
                       className="w-20 text-center"
                       min="1"
@@ -235,7 +330,10 @@ export const PomodoroTimer: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <Button type="submit" className="w-full text-lg h-12 bg-indigo-600 hover:bg-indigo-700 transition-colors duration-300 ease-in-out transform hover:scale-105">
+              <Button
+                type="submit"
+                className="w-full text-lg h-12 bg-indigo-600 hover:bg-indigo-700 transition-colors duration-300 ease-in-out transform hover:scale-105"
+              >
                 Start Your Productivity Journey
               </Button>
             </motion.form>
@@ -268,7 +366,9 @@ export const PomodoroTimer: React.FC = () => {
                     strokeWidth="5"
                     strokeLinecap="round"
                     initial={{ pathLength: 0 }}
-                    animate={{ pathLength: isNaN(percentage) ? 0 : percentage / 100 }}
+                    animate={{
+                      pathLength: isNaN(percentage) ? 0 : percentage / 100,
+                    }}
                     transition={{ duration: 0.5, ease: "easeInOut" }}
                     style={{
                       rotate: -90,
@@ -311,19 +411,35 @@ export const PomodoroTimer: React.FC = () => {
                 {getMotivationalMessage()}
               </div>
               <div className="flex justify-center space-x-4">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   <Button
+                    disabled={
+                      isBreak ||
+                      activeFocusSession?.data?.status === "finished" ||
+                      activeFocusSession?.data?.status === "unfinished" ||
+                      activeFocusSession === undefined
+                    }
                     onClick={toggleTimer}
                     className={`w-14 h-14 rounded-full ${
                       isActive
-                        ? 'bg-red-500 hover:bg-red-600 text-white'
-                        : 'bg-green-500 hover:bg-green-600 text-white'
+                        ? "bg-red-500 hover:bg-red-600 text-white"
+                        : "bg-green-500 hover:bg-green-600 text-white"
                     } transition-colors duration-300 ease-in-out`}
                   >
-                    {isActive ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+                    {isActive ? (
+                      <Pause className="w-6 h-6" />
+                    ) : (
+                      <Play className="w-6 h-6" />
+                    )}
                   </Button>
                 </motion.div>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   <Button
                     onClick={handleReset}
                     className="w-14 h-14 rounded-full bg-gray-300 hover:bg-gray-400 text-gray-800 transition-colors duration-300 ease-in-out"
@@ -331,14 +447,45 @@ export const PomodoroTimer: React.FC = () => {
                     <RotateCcw className="w-6 h-6" />
                   </Button>
                 </motion.div>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button
-                  disabled={isBreak || activeFocusSession?.data?.status !== 'active'}
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {/* <Button
+                  disabled={isBreak || activeFocusSession?.data?.status !== 'active' || activeFocusSession?.data !== undefined}
+                    onClick={handleEditTimes}
+                    className="w-14 h-14 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white transition-colors duration-300 ease-in-out"
+                  >
+                    <Edit2 className="w-6 h-6" />
+                  </Button> */}
+                  {
+                    activeFocusSession?.data === null ?   <Button
+                    // disabled={
+                    //   isBreak ||
+                    //   !(
+                    //     activeFocusSession?.data?.status === "active" &&
+                    //     activeFocusSession?.data !== undefined
+                    //   )|| activeFocusSession?.data !== null
+                    // }
+                    onClick={handleEditTimes}
+                    className="w-14 h-14 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white transition-colors duration-300 ease-in-out"
+                  >
+                    <Edit2 className="w-6 h-6" />
+                  </Button> :   <Button
+                    disabled={
+                      isBreak ||
+                      !(
+                        activeFocusSession?.data?.status === "active" &&
+                        activeFocusSession?.data !== undefined
+                      )
+                    }
                     onClick={handleEditTimes}
                     className="w-14 h-14 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white transition-colors duration-300 ease-in-out"
                   >
                     <Edit2 className="w-6 h-6" />
                   </Button>
+                  }
+                
                 </motion.div>
               </div>
               <motion.div
@@ -400,12 +547,16 @@ export const PomodoroTimer: React.FC = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure you want to reset?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action will reset your timer and you will lose your continuous session streak. Your daily use streak will not be affected. Are you certain you want to start over?
+              This action will reset your timer and you will lose your
+              continuous session streak. Your daily use streak will not be
+              affected. Are you certain you want to start over?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Keep Going</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmReset}>Yes, Reset</AlertDialogAction>
+            <AlertDialogAction onClick={confirmReset}>
+              Yes, Reset
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -415,16 +566,22 @@ export const PomodoroTimer: React.FC = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Taking a Break?</AlertDialogTitle>
             <AlertDialogDescription>
-              Remember, pausing for more than 10 minutes will reset your continuous session streak. Your daily use streak will not be affected. Short breaks are good, but try to stay focused on your goals!
+              Remember, pausing for more than 10 minutes will reset your
+              continuous session streak. Your daily use streak will not be
+              affected. Short breaks are good, but try to stay focused on your
+              goals!
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setShowPauseDialog(false)}>Keep Focusing</AlertDialogCancel>
-            <AlertDialogAction onClick={handlePause}>Pause Timer</AlertDialogAction>
+            <AlertDialogCancel onClick={() => setShowPauseDialog(false)}>
+              Keep Focusing
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handlePause}>
+              Pause Timer
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </Card>
   );
 };
-

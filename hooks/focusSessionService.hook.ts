@@ -1,4 +1,4 @@
-import { createFocusSession, getActiveFocusSession, startFocusSession, updateFocusSessionStatus } from "@/services/FocusSessionService";
+import { createFocusSession, getActiveFocusSession, startFocusSession, updateFocusSession, updateFocusSessionStatus } from "@/services/FocusSessionService";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FieldValues } from "react-hook-form";
 import { toast } from "sonner";
@@ -55,6 +55,23 @@ export const useStartFocusSession = () => {
         mutationFn: async () => await startFocusSession(),
         onSuccess: () => {
             toast.success("Session started.");
+            queryClient.invalidateQueries({ queryKey: ['GET_ACTIVE_FOCUS_SESSION'] })
+        },
+        onError: (error) => {
+            toast.error(error.message);
+        },
+    })
+};
+
+export const useUpdateFocusSession = () => {
+    const queryClient = useQueryClient();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return useMutation<any, Error, FieldValues>({
+        mutationKey: ["UPDATE_FOCUS_SESSION"],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mutationFn: async (data: any) => await updateFocusSession(data),
+        onSuccess: () => {
+            toast.success("Focus session updated successfully.");
             queryClient.invalidateQueries({ queryKey: ['GET_ACTIVE_FOCUS_SESSION'] })
         },
         onError: (error) => {

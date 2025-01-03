@@ -56,3 +56,16 @@ export const startFocusSession = async () => {
         throw new Error(error);
     }
 };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const updateFocusSession = async (data: any) => {
+    try {
+        const currentUser = await getCurrentUser();
+        const id = currentUser?.id;
+        const { data: response } = await axiosInstance.put(`/focusSession/${id}`, data);
+        return response;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+        throw new Error(error);
+    }
+};
