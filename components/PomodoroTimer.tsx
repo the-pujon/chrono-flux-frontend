@@ -11,6 +11,7 @@ import { incrementSession, resetContinuousSessionStreak, setPauseStartTime, chec
 import { motion, AnimatePresence } from 'framer-motion';
 import { Edit2, Play, Pause, RotateCcw, Coffee, Zap } from 'lucide-react';
 import { RootState } from '@/redux/store';
+import { useCreateFocusSession } from '@/hooks/focusSessionService.hook';
 
 export const PomodoroTimer: React.FC = () => {
   const [showTimer, setShowTimer] = useState(false);
@@ -23,7 +24,8 @@ export const PomodoroTimer: React.FC = () => {
   const [customBreakTime, setCustomBreakTime] = useState(5);
   const dispatch = useDispatch();
   const { currentSession, dailyUseStreak, continuousSessionStreak } = useSelector((state: RootState) => state.focusTracker);
-
+  const { mutate: createFocusSession } = useCreateFocusSession()
+  
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
@@ -89,6 +91,10 @@ export const PomodoroTimer: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    createFocusSession({
+      sessionTime: customFocusTime * 60,
+      breakTime: customBreakTime * 60,
+    });
     setTime(customFocusTime * 60);
     setShowTimer(true);
     setIsActive(false);
@@ -124,6 +130,7 @@ export const PomodoroTimer: React.FC = () => {
       <CardContent className="p-6">
         <AnimatePresence mode="wait">
           {!showTimer ? (
+            // Input form
             <motion.form
               key="input-form"
               className="space-y-6"
@@ -194,6 +201,7 @@ export const PomodoroTimer: React.FC = () => {
               </Button>
             </motion.form>
           ) : (
+            // Timer
             <motion.div
               key="timer"
               className="space-y-6"
