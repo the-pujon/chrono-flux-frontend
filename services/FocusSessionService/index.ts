@@ -83,3 +83,31 @@ export const getTodayFocusSession = async () => {
         throw new Error(error);
     }
 };
+
+export const weeklyFocusSession = async () => {
+    try {
+        const currentUser = await getCurrentUser();
+        if (!currentUser || !currentUser.id) {
+            throw new Error("Current user not found or ID is missing");
+        }
+        const { data: response } = await axiosInstance.get(`/focusSession/${currentUser.id}/weekly`);
+        return response;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+        throw new Error(error);
+    }
+};
+
+export const monthlyFocusSession = async () => {
+    try {
+        const currentUser = await getCurrentUser();
+        if (!currentUser || !currentUser.id) {
+            throw new Error("Current user not found or ID is missing");
+        }
+        const { data: response } = await axiosInstance.get(`/focusSession/${currentUser.id}/monthly`);
+        return response;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+        throw new Error(error);
+    }
+};

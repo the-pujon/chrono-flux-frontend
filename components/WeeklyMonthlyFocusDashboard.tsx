@@ -1,35 +1,53 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { RootState } from '../store/store';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useMonthlyFocusSession, useWeeklyFocusSession } from '@/hooks/focusSessionService.hook';
 
 export const WeeklyMonthlyFocusDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('weekly');
-  const { weeklyFocusTime, weeklySessions, monthlyFocusTime, monthlySessions } = useSelector((state: RootState) => state.focusTracker);
+ 
+  const {
+    data: weeklyDataResponse,
+    // isLoading: isWeeklyLoading,
+    // isError: isWeeklyError,
+  } = useWeeklyFocusSession();
 
-  const weeklyData = weeklyFocusTime.map((time, index) => ({
+  const {
+    data: monthlyDataResponse,
+    // isLoading: isMonthlyLoading,
+    // isError: isMonthlyError,
+  } = useMonthlyFocusSession();
+
+  const weeklyFocusTime = weeklyDataResponse?.data?.weeklyFocusTime || [];
+  const weeklySessions = weeklyDataResponse?.data?.weeklySessions || [];
+  const monthlyFocusTime = monthlyDataResponse?.data?.monthlyFocusTime || [];
+  const monthlySessions = monthlyDataResponse?.data?.monthlySessions || [];
+
+  const weeklyData = weeklyFocusTime.map((time: number, index: number) => ({
     day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][index],
     focusTime: time,
     sessions: weeklySessions[index],
   }));
 
-  const monthlyData = monthlyFocusTime.map((time, index) => ({
+  const monthlyData = monthlyFocusTime.map((time: number, index: number) => ({
     day: index + 1,
     focusTime: time,
     sessions: monthlySessions[index],
   }));
 
-  const totalWeeklySessions = weeklySessions.reduce((sum, sessions) => sum + sessions, 0);
-  const totalMonthlySessions = monthlySessions.reduce((sum, sessions) => sum + sessions, 0);
+  const totalWeeklySessions = weeklySessions.reduce((sum: number, sessions: number) => sum + sessions, 0);
+  const totalMonthlySessions = monthlySessions.reduce((sum: number, sessions: number) => sum + sessions, 0);
 
-  const formatTime = (minutes: number): string => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours}h ${mins}m`;
+  const formatTime = (seconds: number): string => {
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours}h ${mins}m ${secs}s`;
   };
+  
 
   const renderChart = (data: any[]) => (
     <motion.div
@@ -81,7 +99,7 @@ export const WeeklyMonthlyFocusDashboard: React.FC = () => {
                   <div className="mb-4 flex justify-between items-center">
                     <div>
                       <p className="text-sm text-gray-600 dark:text-gray-400">Total Weekly Focus Time</p>
-                      <p className="text-2xl font-bold text-blue-700 dark:text-blue-200">{formatTime(weeklyFocusTime.reduce((sum, time) => sum + time, 0))}</p>
+                      <p className="text-2xl font-bold text-blue-700 dark:text-blue-200">{formatTime(weeklyFocusTime.reduce((sum: number, time: number) => sum + time, 0))}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600 dark:text-gray-400">Total Weekly Sessions</p>
@@ -94,7 +112,7 @@ export const WeeklyMonthlyFocusDashboard: React.FC = () => {
                   <div className="mb-4 flex justify-between items-center">
                     <div>
                       <p className="text-sm text-gray-600 dark:text-gray-400">Total Monthly Focus Time</p>
-                      <p className="text-2xl font-bold text-blue-700 dark:text-blue-200">{formatTime(monthlyFocusTime.reduce((sum, time) => sum + time, 0))}</p>
+                      <p className="text-2xl font-bold text-blue-700 dark:text-blue-200">{formatTime(monthlyFocusTime.reduce((sum: number, time: number) => sum + time, 0))}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600 dark:text-gray-400">Total Monthly Sessions</p>

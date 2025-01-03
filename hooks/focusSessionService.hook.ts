@@ -1,4 +1,4 @@
-import { createFocusSession, getActiveFocusSession, getTodayFocusSession, startFocusSession, updateFocusSession, updateFocusSessionStatus } from "@/services/FocusSessionService";
+import { createFocusSession, getActiveFocusSession, getTodayFocusSession, monthlyFocusSession, startFocusSession, updateFocusSession, updateFocusSessionStatus, weeklyFocusSession } from "@/services/FocusSessionService";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FieldValues } from "react-hook-form";
 import { toast } from "sonner";
@@ -88,5 +88,19 @@ export const useTodayFocusSession = () => {
     return useQuery({
       queryKey: ["GET_TODAY_FOCUS_SESSION"],
       queryFn: async () => await getTodayFocusSession(),
+    });
+  };
+
+  export const useWeeklyFocusSession = () => {
+    return useQuery({
+      queryKey: ["GET_WEEKLY_FOCUS_SESSION"],
+      queryFn: async () => await weeklyFocusSession(),
+    });
+  };
+
+  export const useMonthlyFocusSession = () => {
+    return useQuery({
+      queryKey: ["GET_MONTHLY_FOCUS_SESSION"],
+      queryFn: async () => await monthlyFocusSession(),
     });
   };

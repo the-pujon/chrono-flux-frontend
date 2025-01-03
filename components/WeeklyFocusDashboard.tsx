@@ -2,7 +2,8 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { RootState } from '../store/store';
+import { RootState } from '@/redux/store';
+// import { RootState } from '../store/store';
 
 export const WeeklyFocusDashboard: React.FC = () => {
   const { weeklyFocusTime } = useSelector((state: RootState) => state.focusTracker);
