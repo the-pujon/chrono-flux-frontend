@@ -1,18 +1,24 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+// import { useSelector } from 'react-redux';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { RootState } from '../store/store';
+// import { RootState } from '../store/store';
 import { Clock, Target } from 'lucide-react';
 import { motion } from 'framer-motion';
+// import { RootState } from '@/redux/store';
+import { useTodayFocusSession } from '@/hooks/focusSessionService.hook';
 
 export const DailyFocusDashboard: React.FC = () => {
-  const { dailyFocusTime, dailySessions } = useSelector((state: RootState) => state.focusTracker);
+  // const { dailyFocusTime, dailySessions } = useSelector((state: RootState) => state.focusTracker);
+  const {data: todayFocusSession} = useTodayFocusSession()
+  console.log(todayFocusSession)
 
-  const formatTime = (minutes: number): string => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours}h ${mins}m`;
+  const formatTime = (seconds: number): string => {
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours}h ${mins}m ${secs}s`;
   };
+  
 
   return (
     <motion.div
@@ -36,12 +42,12 @@ export const DailyFocusDashboard: React.FC = () => {
               <p className="text-sm text-gray-600 dark:text-gray-400">Total focus time today</p>
               <motion.p
                 className="text-2xl font-bold text-blue-700 dark:text-blue-200"
-                key={dailyFocusTime}
+                key={todayFocusSession?.data?.totalSessions}
                 initial={{ scale: 1.2, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                {formatTime(dailyFocusTime)}
+                {formatTime(todayFocusSession?.data?.totalTimes)}
               </motion.p>
             </motion.div>
             <motion.div
@@ -54,12 +60,12 @@ export const DailyFocusDashboard: React.FC = () => {
               <p className="text-sm text-gray-600 dark:text-gray-400">Total sessions today</p>
               <motion.p
                 className="text-2xl font-bold text-green-700 dark:text-green-200"
-                key={dailySessions}
+                key={todayFocusSession?.data?.totalSessions}
                 initial={{ scale: 1.2, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                {dailySessions}
+                {todayFocusSession?.data?.totalSessions}
               </motion.p>
             </motion.div>
           </motion.div>

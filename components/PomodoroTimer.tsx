@@ -18,8 +18,8 @@ import { Slider } from "@/components/ui/slider";
 import {
   incrementSession,
   resetContinuousSessionStreak,
-  setPauseStartTime,
-  checkPauseAndUpdateStreak,
+  // setPauseStartTime,
+  // checkPauseAndUpdateStreak,
 } from "@/redux/features/focusTracker/focusTrackerSlice";
 // import { RootState } from '../store/store';
 import { motion, AnimatePresence } from "framer-motion";
@@ -44,7 +44,7 @@ export const PomodoroTimer: React.FC = () => {
   const [customBreakTime, setCustomBreakTime] = useState(5);
 
   const dispatch = useDispatch();
-  const { currentSession, dailyUseStreak, continuousSessionStreak } =
+  const { currentSession, continuousSessionStreak } =
     useSelector((state: RootState) => state.focusTracker);
   const { mutate: createFocusSession } = useCreateFocusSession();
   const { data: activeFocusSession } = useGetActiveFocusSession();
@@ -73,7 +73,7 @@ export const PomodoroTimer: React.FC = () => {
       }, 1000);
     } else if (time === 0 && isActive) {
       if (!isBreak) {
-        dispatch(incrementSession());
+        dispatch(incrementSession(customFocusTime));
         setIsBreak(true);
         setTime(activeFocusSession?.data?.breakTime || customBreakTime * 60);
       } else {
@@ -109,14 +109,6 @@ export const PomodoroTimer: React.FC = () => {
       } else if (activeFocusSession.data?.status === "active") {
         startFocusSession({ id: activeFocusSession.data.id });
       }else if(activeFocusSession?.data === null){
-      //   console.log('here')
-      //  const result = createFocusSession({
-      //     sessionTime: customFocusTime * 60,
-      //     breakTime: customBreakTime * 60,
-      //   });
-
-      //   console.log("result", result);
-      //   startFocusSession({ id: createFocusSession.data.id });
       createFocusSession({
         sessionTime: customFocusTime * 60,
         breakTime: customBreakTime * 60,
@@ -128,7 +120,7 @@ export const PomodoroTimer: React.FC = () => {
         }
       });
       }
-      dispatch(checkPauseAndUpdateStreak());
+      // dispatch(checkPauseAndUpdateStreak());
       setIsActive(true);
     }
   };
@@ -136,7 +128,7 @@ export const PomodoroTimer: React.FC = () => {
   const handlePause = () => {
     updateFocusSessionStatus({ status: "paused" });
     setIsActive(false);
-    dispatch(setPauseStartTime(Date.now()));
+    // dispatch(setPauseStartTime(Date.now()));
     setShowPauseDialog(false);
   };
 
@@ -509,7 +501,7 @@ export const PomodoroTimer: React.FC = () => {
                   </motion.div>
                 </AnimatePresence>
                 <AnimatePresence mode="wait">
-                  <motion.div
+                  {/* <motion.div
                     key={dailyUseStreak}
                     className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg"
                     initial={{ opacity: 0, y: -20 }}
@@ -520,7 +512,7 @@ export const PomodoroTimer: React.FC = () => {
                     <p className="text-lg font-semibold text-indigo-700 dark:text-indigo-300">
                       Daily Streak: {dailyUseStreak} days
                     </p>
-                  </motion.div>
+                  </motion.div> */}
                 </AnimatePresence>
                 <AnimatePresence mode="wait">
                   <motion.div

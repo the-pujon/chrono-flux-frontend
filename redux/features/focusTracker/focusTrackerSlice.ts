@@ -18,13 +18,10 @@ interface FocusTrackerState {
   weeklySessions: number[];
   monthlyFocusTime: number[];
   monthlySessions: number[];
-  dailyUseStreak: number;
   continuousSessionStreak: number;
-  longestDailyUseStreak: number;
   longestContinuousSessionStreak: number;
   badges: string[];
   lastSessionDate: string | null;
-  pauseStartTime: number | null;
   tasks: Task[];
 }
 
@@ -37,13 +34,10 @@ const initialState: FocusTrackerState = {
   weeklySessions: [0, 0, 0, 0, 0, 0, 0],
   monthlyFocusTime: Array(30).fill(0),
   monthlySessions: Array(30).fill(0),
-  dailyUseStreak: 0,
   continuousSessionStreak: 0,
-  longestDailyUseStreak: 0,
   longestContinuousSessionStreak: 0,
   badges: [],
   lastSessionDate: null,
-  pauseStartTime: null,
   tasks: [],
 };
 
@@ -51,36 +45,21 @@ const focusTrackerSlice = createSlice({
   name: 'focusTracker',
   initialState,
   reducers: {
-    incrementSession: (state) => {
+    incrementSession: (state, action: PayloadAction<number>) => {
+      const focusTime = action.payload;
       const today = new Date();
       const dayOfWeek = today.getDay();
       const dayOfMonth = today.getDate() - 1;
       const todayString = today.toDateString();
 
       state.currentSession += 1;
-      state.totalFocusTime += 25;
-      state.dailyFocusTime += 25;
+      state.totalFocusTime += focusTime;
+      state.dailyFocusTime += focusTime;
       state.dailySessions += 1;
-      state.weeklyFocusTime[dayOfWeek] += 25;
+      state.weeklyFocusTime[dayOfWeek] += focusTime;
       state.weeklySessions[dayOfWeek] += 1;
-      state.monthlyFocusTime[dayOfMonth] += 25;
+      state.monthlyFocusTime[dayOfMonth] += focusTime;
       state.monthlySessions[dayOfMonth] += 1;
-
-      // Update daily use streak
-      if (state.lastSessionDate !== todayString) {
-        if (state.lastSessionDate) {
-          const lastDate = new Date(state.lastSessionDate);
-          const dayDifference = (today.getTime() - lastDate.getTime()) / (1000 * 3600 * 24);
-          if (dayDifference <= 1) {
-            state.dailyUseStreak += 1;
-          } else {
-            state.dailyUseStreak = 1;
-          }
-        } else {
-          state.dailyUseStreak = 1;
-        }
-        state.longestDailyUseStreak = Math.max(state.longestDailyUseStreak, state.dailyUseStreak);
-      }
 
       // Update continuous session streak
       state.continuousSessionStreak += 1;
@@ -94,18 +73,6 @@ const focusTrackerSlice = createSlice({
     },
     resetContinuousSessionStreak: (state) => {
       state.continuousSessionStreak = 0;
-    },
-    setPauseStartTime: (state, action: PayloadAction<number | null>) => {
-      state.pauseStartTime = action.payload;
-    },
-    checkPauseAndUpdateStreak: (state) => {
-      if (state.pauseStartTime) {
-        const pauseDuration = Date.now() - state.pauseStartTime;
-        if (pauseDuration > 10 * 60 * 1000) { // 10 minutes in milliseconds
-          state.continuousSessionStreak = 0;
-        }
-      }
-      state.pauseStartTime = null;
     },
     addBadge: (state, action: PayloadAction<string>) => {
       if (!state.badges.includes(action.payload)) {
@@ -163,8 +130,6 @@ const focusTrackerSlice = createSlice({
 export const {
   incrementSession,
   resetContinuousSessionStreak,
-  setPauseStartTime,
-  checkPauseAndUpdateStreak,
   addBadge,
   resetDailyStats,
   resetWeeklyStats,

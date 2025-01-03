@@ -1,4 +1,4 @@
-import { createFocusSession, getActiveFocusSession, startFocusSession, updateFocusSession, updateFocusSessionStatus } from "@/services/FocusSessionService";
+import { createFocusSession, getActiveFocusSession, getTodayFocusSession, startFocusSession, updateFocusSession, updateFocusSessionStatus } from "@/services/FocusSessionService";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FieldValues } from "react-hook-form";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ export const useCreateFocusSession = () => {
         onSuccess: () => {
             toast.success("Focus session created successfully.");
             queryClient.invalidateQueries({ queryKey: ['GET_ACTIVE_FOCUS_SESSION'] })
+            queryClient.invalidateQueries({ queryKey: ['GET_TODAY_FOCUS_SESSION'] })
         },
         onError: (error) => {
             toast.error(error.message);
@@ -39,6 +40,7 @@ export const useGetActiveFocusSession = () => {
         onSuccess: () => {
             toast.success("Done.");
             queryClient.invalidateQueries({ queryKey: ['GET_ACTIVE_FOCUS_SESSION'] })
+            queryClient.invalidateQueries({ queryKey: ['GET_TODAY_FOCUS_SESSION'] })
         },
         onError: (error) => {
             toast.error(error.message);
@@ -56,6 +58,7 @@ export const useStartFocusSession = () => {
         onSuccess: () => {
             toast.success("Session started.");
             queryClient.invalidateQueries({ queryKey: ['GET_ACTIVE_FOCUS_SESSION'] })
+            queryClient.invalidateQueries({ queryKey: ['GET_TODAY_FOCUS_SESSION'] })
         },
         onError: (error) => {
             toast.error(error.message);
@@ -73,9 +76,17 @@ export const useUpdateFocusSession = () => {
         onSuccess: () => {
             toast.success("Focus session updated successfully.");
             queryClient.invalidateQueries({ queryKey: ['GET_ACTIVE_FOCUS_SESSION'] })
+            queryClient.invalidateQueries({ queryKey: ['GET_TODAY_FOCUS_SESSION'] })
         },
         onError: (error) => {
             toast.error(error.message);
         },
     })
 };
+
+export const useTodayFocusSession = () => {
+    return useQuery({
+      queryKey: ["GET_TODAY_FOCUS_SESSION"],
+      queryFn: async () => await getTodayFocusSession(),
+    });
+  };
