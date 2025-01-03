@@ -1,12 +1,33 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
+import { getCurrentUser, logout } from '@/redux/features/auth/authSlice';
+import Link from 'next/link';
 
 export const UserChatHead: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.auth.user);
+
+
+  useEffect(() => {
+    dispatch(getCurrentUser());
+  }, [dispatch]);
+
+  if (!user) {
+    return (
+      <div className="fixed top-4 right-4 z-[100]">
+        <Button asChild className="bg-indigo-600 hover:bg-indigo-700 text-white">
+          <Link href="/auth/login">Login</Link>
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed top-4 right-4 z-[100]">
@@ -30,14 +51,23 @@ export const UserChatHead: React.FC = () => {
               <CardContent>
                 <div className="flex items-center space-x-4">
                   <Avatar>
-                    <AvatarImage src="/user-avatar.png" alt="User" />
-                    <AvatarFallback>U</AvatarFallback>
+                    <AvatarImage src={user?.avatar} alt={user?.name} />
+                    <AvatarFallback>{user?.name[0]}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm font-medium">John Doe</p>
-                    <p className="text-xs text-muted-foreground">john@example.com</p>
+                    <p className="text-sm font-medium">{user?.name}</p>
+                    <p className="text-xs text-muted-foreground">{user?.email}</p>
                   </div>
                 </div>
+                <Button
+                  className="w-full mt-4"
+                  onClick={() => {
+                    dispatch(logout());
+                    setIsOpen(false);
+                  }}
+                >
+                  Logout
+                </Button>
               </CardContent>
             </Card>
           </motion.div>
@@ -56,8 +86,8 @@ export const UserChatHead: React.FC = () => {
               onClick={() => setIsOpen(true)}
             >
               <Avatar>
-                <AvatarImage src="/user-avatar.png" alt="User" />
-                <AvatarFallback>U</AvatarFallback>
+                <AvatarImage src={user?.avatar} alt={user?.name} />
+                <AvatarFallback>{user?.name[0]}</AvatarFallback>
               </Avatar>
             </Button>
           </motion.div>
@@ -66,4 +96,3 @@ export const UserChatHead: React.FC = () => {
     </div>
   );
 };
-

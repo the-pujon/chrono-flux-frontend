@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react';
+import React, { useEffect } from 'react';
 // import store from '../store/store';
 import { PomodoroTimer } from '../components/PomodoroTimer';
 import { DailyFocusDashboard } from '../components/DailyFocusDashboard';
@@ -9,10 +9,23 @@ import { GamificationDisplay } from '../components/GamificationDisplay';
 import { UserChatHead } from '../components/UserChatHead';
 import { TaskChatHead } from '../components/TaskChatHead';
 import { motion } from 'framer-motion';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  return (
 
+  const user = useSelector((state: RootState) => state.auth.user);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/auth/login');
+    }
+  }, [user, router]);
+
+  return (
       <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950">
         <motion.div
           className="container mx-auto py-8 px-4 pt-16 pb-20"

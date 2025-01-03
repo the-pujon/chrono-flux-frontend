@@ -11,6 +11,7 @@ import { useForm } from 'react-hook-form'
 import { Lock, Mail } from 'lucide-react'
 import { useUserLogin } from '@/hooks/auth.hook'
 import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 type FormData = {
   email: string;
@@ -23,10 +24,12 @@ export default function LoginPage() {
   })
 
   const { mutate: handleUserLogin,  isLoading } = useUserLogin();
+  const router = useRouter();
 
   const onSubmit = (data: FormData) => {
     console.log(data)
     handleUserLogin(data)
+    router.push("/")
     // Here you would typically handle the login logic
   }
   

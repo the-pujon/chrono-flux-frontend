@@ -144,14 +144,6 @@ export const PomodoroTimer: React.FC = () => {
           .toString()
           .padStart(2, "0")}`;
   };
-  // const formatTime = (seconds: number): string => {
-  //   const hours = Math.floor(seconds / 3600);
-  //   const minutes = Math.floor((seconds % 3600) / 60);
-  //   const remainingSeconds = seconds % 60;
-  //   return hours > 0
-  //     ? `${hours}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
-  //     : `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-  // };
 
   const percentage =
     isNaN(time) ||
@@ -478,8 +470,7 @@ export const PomodoroTimer: React.FC = () => {
             <AlertDialogTitle>Are you sure you want to reset?</AlertDialogTitle>
             <AlertDialogDescription>
               This action will reset your timer and you will lose your
-              continuous session streak. Your daily use streak will not be
-              affected. Are you certain you want to start over?
+              streak. Are you certain you want to start over?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -496,9 +487,7 @@ export const PomodoroTimer: React.FC = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Taking a Break?</AlertDialogTitle>
             <AlertDialogDescription>
-              Remember, pausing for more than 10 minutes will reset your
-              continuous session streak. Your daily use streak will not be
-              affected. Short breaks are good, but try to stay focused on your
+             Short breaks are good, but try to stay focused on your
               goals!
             </AlertDialogDescription>
           </AlertDialogHeader>

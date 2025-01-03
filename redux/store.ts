@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import focusTrackerReducer from './features/focusTracker/focusTrackerSlice';
+import authReducer from './features/auth/authSlice';
 
 const store = configureStore({
   reducer: {
     focusTracker: focusTrackerReducer,
+    auth: authReducer,
   },
 });
 
