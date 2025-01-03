@@ -33,3 +33,26 @@ export const getActiveFocusSession = async () => {
         throw new Error(error);
     }
 };
+
+export const updateFocusSessionStatus = async ( status: string) => {
+    const currentUser = await getCurrentUser();
+    try {
+        const { data: response } = await axiosInstance.put(`/focusSession/${currentUser?.id}/status`, { status });
+        return response;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+        throw new Error(error);
+    }
+};
+
+export const startFocusSession = async () => {
+    console.log("startFocusSession");
+    const currentUser = await getCurrentUser();
+    try {
+        const { data: response } = await axiosInstance.put(`/focusSession/${currentUser?.id}/start`);
+        return response;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+        throw new Error(error);
+    }
+};

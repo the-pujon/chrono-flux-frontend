@@ -11,7 +11,7 @@ import { incrementSession, resetContinuousSessionStreak, setPauseStartTime, chec
 import { motion, AnimatePresence } from 'framer-motion';
 import { Edit2, Play, Pause, RotateCcw, Coffee, Zap } from 'lucide-react';
 import { RootState } from '@/redux/store';
-import { useCreateFocusSession } from '@/hooks/focusSessionService.hook';
+import { useCreateFocusSession, useGetActiveFocusSession, useStartFocusSession, useUpdateFocusSessionStatus } from '@/hooks/focusSessionService.hook';
 
 export const PomodoroTimer: React.FC = () => {
   const [showTimer, setShowTimer] = useState(false);
@@ -22,10 +22,27 @@ export const PomodoroTimer: React.FC = () => {
   const [showPauseDialog, setShowPauseDialog] = useState(false);
   const [customFocusTime, setCustomFocusTime] = useState(25);
   const [customBreakTime, setCustomBreakTime] = useState(5);
+  
   const dispatch = useDispatch();
   const { currentSession, dailyUseStreak, continuousSessionStreak } = useSelector((state: RootState) => state.focusTracker);
-  const { mutate: createFocusSession } = useCreateFocusSession()
+  const { mutate: createFocusSession } = useCreateFocusSession();
+  const { data: activeFocusSession } = useGetActiveFocusSession();
+  const { mutate: updateFocusSessionStatus } = useUpdateFocusSessionStatus();
+  const { mutate: startFocusSession } = useStartFocusSession();
+
+  console.log(activeFocusSession);
   
+
+  useEffect(() => {
+    if (activeFocusSession?.data) {
+      setTime(activeFocusSession.data.pausedTime);
+      setCustomFocusTime(Math.floor(activeFocusSession.data.pausedTime / 60));
+      setCustomBreakTime(Math.floor(activeFocusSession.data.breakTime / 60));
+      setShowTimer(true);
+      setIsActive(activeFocusSession.data.status === 'inprogress');
+    }
+  }, [activeFocusSession]);
+
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
@@ -37,28 +54,39 @@ export const PomodoroTimer: React.FC = () => {
       if (!isBreak) {
         dispatch(incrementSession());
         setIsBreak(true);
-        setTime(customBreakTime * 60);
+        setTime(activeFocusSession?.data?.breakTime || customBreakTime * 60);
       } else {
+        updateFocusSessionStatus({ status: 'finished' });
+        setIsActive(false);
         setIsBreak(false);
-        setTime(customFocusTime * 60);
+        setTime(activeFocusSession?.data?.sessionTime || customFocusTime * 60);
       }
     }
 
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isActive, time, isBreak, dispatch, customFocusTime, customBreakTime]);
+  }, [isActive, time, isBreak, dispatch, customFocusTime, customBreakTime, activeFocusSession, updateFocusSessionStatus]);
 
   const toggleTimer = () => {
+    if (!activeFocusSession?.data) return;
+
     if (isActive) {
       setShowPauseDialog(true);
     } else {
+     
+      if (activeFocusSession.data.status === 'paused') {
+        updateFocusSessionStatus({ status: 'inprogress' });
+    } else if (activeFocusSession.data.status === 'active') {
+        startFocusSession({ id: activeFocusSession.data.id });
+    }
       dispatch(checkPauseAndUpdateStreak());
       setIsActive(true);
     }
   };
 
   const handlePause = () => {
+    updateFocusSessionStatus({ status: 'paused' });
     setIsActive(false);
     dispatch(setPauseStartTime(Date.now()));
     setShowPauseDialog(false);
@@ -69,13 +97,15 @@ export const PomodoroTimer: React.FC = () => {
   };
 
   const confirmReset = () => {
+    updateFocusSessionStatus({ status: 'unfinished' });
     setIsActive(false);
     setIsBreak(false);
-    setTime(customFocusTime * 60);
+    setTime(activeFocusSession?.data?.sessionTime || customFocusTime * 60);
     dispatch(resetContinuousSessionStreak());
     setShowResetDialog(false);
   };
 
+  // Rest of the component remains the same...
   const formatTime = (seconds: number): string => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -84,10 +114,19 @@ export const PomodoroTimer: React.FC = () => {
       ? `${hours}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
       : `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
+  // const formatTime = (seconds: number): string => {
+  //   const hours = Math.floor(seconds / 3600);
+  //   const minutes = Math.floor((seconds % 3600) / 60);
+  //   const remainingSeconds = seconds % 60;
+  //   return hours > 0
+  //     ? `${hours}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
+  //     : `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  // };
 
-  const percentage = isNaN(time) || isNaN(isBreak ? customBreakTime : customFocusTime) ? 
+  const percentage = isNaN(time) || isNaN(isBreak ? activeFocusSession?.data?.breakTime || customBreakTime * 60 : activeFocusSession?.data?.sessionTime || customFocusTime * 60) ? 
     0 : 
-    ((isBreak ? customBreakTime * 60 - time : customFocusTime * 60 - time) / (isBreak ? customBreakTime * 60 : customFocusTime * 60)) * 100;
+    ((isBreak ? activeFocusSession?.data?.breakTime || customBreakTime * 60 - time : activeFocusSession?.data?.sessionTime || customFocusTime * 60 - time) / 
+    (isBreak ? activeFocusSession?.data?.breakTime || customBreakTime * 60 : activeFocusSession?.data?.sessionTime || customFocusTime * 60)) * 100;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -294,6 +333,7 @@ export const PomodoroTimer: React.FC = () => {
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button
+                  disabled={isBreak || activeFocusSession?.data?.status !== 'active'}
                     onClick={handleEditTimes}
                     className="w-14 h-14 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white transition-colors duration-300 ease-in-out"
                   >
