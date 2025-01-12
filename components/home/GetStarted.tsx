@@ -43,14 +43,14 @@ const GetStarted = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="relative bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md"
+                className="relative bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md flex flex-col gap-4"
               >
                 <div>
-                  <span className="absolute top-6 left-6 inline-block p-3 bg-indigo-100 dark:bg-indigo-800 rounded-full">
+                  <span className="  inline-block p-3 bg-indigo-100 dark:bg-indigo-800 rounded-full">
                     <step.icon className="h-6 w-6 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
                   </span>
-                  <h3 className="mt-8 text-lg font-medium text-gray-900 dark:text-white">{step.title}</h3>
-                  <p className="mt-2 text-base text-gray-500 dark:text-gray-300">{step.description}</p>
+                  <h3 className=" text-lg font-medium text-gray-900 dark:text-white">{step.title}</h3>
+                  <p className=" text-base text-gray-500 dark:text-gray-300">{step.description}</p>
                 </div>
               </motion.div>
             ))}
