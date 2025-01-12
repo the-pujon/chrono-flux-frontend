@@ -1,12 +1,33 @@
 'use client'
 
-import { useState } from 'react'
+import {  useState } from 'react'
 import { motion } from 'framer-motion'
 import { Clock, Menu, X } from 'lucide-react'
 import Link from 'next/link'
+// import { useSelector } from 'react-redux'
+// import { RootState } from '@/redux/store'
+// import { getCurrentUser } from '@/services/AuthService'
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false)
+  // const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  // const user = useSelector((state: RootState) => state.auth.user);
+
+  // const u = getCurrentUser()
+  // console.log(u)
+
+  // console.log(user)
+
+  // useEffect(() => {
+  //   if (!u) {
+  //     // router.push('/auth/login');
+  //     setIsLoggedIn(false)
+  //   }
+  //   else {
+  //     setIsLoggedIn(true)
+  //   }
+  // }, [u]);
 
   return (
     <header className="bg-white/30 backdrop-blur-lg dark:bg-gray-800 shadow-md self-start sticky top-0 z-10">
@@ -42,7 +63,7 @@ const Header = () => {
             <Link href="#testimonials" className="text-base font-medium text-gray-500 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
               Testimonials
             </Link>
-            <Link href="#cta" className="w-full rounded-full py-2 px-4 flex items-center justify-center  border border-transparent text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+            <Link href={`/tracker`} className="w-full rounded-full py-2 px-4 flex items-center justify-center  border border-transparent text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700">
                     Get started
                   </Link>
           </nav>

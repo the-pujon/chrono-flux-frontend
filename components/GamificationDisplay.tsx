@@ -10,6 +10,7 @@ import { useGetFocusStreakByUserId } from '@/hooks/focusSessionService.hook';
 export const GamificationDisplay: React.FC = () => {
 
   const {data: focusStreakByUserId} = useGetFocusStreakByUserId();
+  console.log("focusStreakByUserId", focusStreakByUserId);
   const continuousSessionStreak = focusStreakByUserId?.data?.streak || 0;
   const badges = focusStreakByUserId?.data?.badges || [];
 

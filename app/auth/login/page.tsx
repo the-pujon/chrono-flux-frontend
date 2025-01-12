@@ -27,9 +27,9 @@ export default function LoginPage() {
   const router = useRouter();
 
   const onSubmit = (data: FormData) => {
-    console.log(data)
+    // console.log(data)
     handleUserLogin(data)
-    router.push("/")
+    router.push("/tracker")
     // Here you would typically handle the login logic
   }
   

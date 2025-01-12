@@ -20,7 +20,7 @@ const Footer = () => {
           </Link>
         </div>
         <div className="mt-8 md:mt-0 md:order-1">
-          <p className="text-center text-base text-gray-400 dark:text-gray-300">&copy; 2023 Chrono Flux. All rights reserved.</p>
+          <p className="text-center text-base text-gray-400 dark:text-gray-300">&copy; {new Date().getFullYear()} Chrono Flux. All rights reserved.</p>
         </div>
       </div>
     </footer>

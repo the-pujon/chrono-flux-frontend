@@ -13,15 +13,17 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { useRouter } from 'next/navigation';
 
-export default function Home() {
+export default function Dashboard() {
 
   const user = useSelector((state: RootState) => state.auth.user);
+
+  // console.log(user)
 
   const router = useRouter();
 
   useEffect(() => {
     if (!user) {
-      router.push('/auth/login');
+      // router.push('/auth/login');
     }
   }, [user, router]);
 

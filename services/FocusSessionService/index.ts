@@ -73,6 +73,8 @@ export const updateFocusSession = async (data: any) => {
 export const getTodayFocusSession = async () => {
     try {
         const currentUser = await getCurrentUser();
+
+        console.log("getTodayFocusSession", currentUser)
         if (!currentUser || !currentUser.id) {
             throw new Error("Current user not found or ID is missing");
         }
