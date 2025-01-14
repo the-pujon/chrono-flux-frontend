@@ -1,7 +1,5 @@
 'use client'
 
-import React, { useEffect } from 'react';
-// import store from '../store/store';
 import { PomodoroTimer } from '@/components/PomodoroTimer';
 import { DailyFocusDashboard } from '@/components/DailyFocusDashboard';
 import { WeeklyMonthlyFocusDashboard } from '@/components/WeeklyMonthlyFocusDashboard';
@@ -9,10 +7,6 @@ import { GamificationDisplay } from '@/components/GamificationDisplay';
 import { UserChatHead } from '@/components/UserChatHead';
 import { TaskChatHead } from '@/components/TaskChatHead';
 import { motion } from 'framer-motion';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
-import { useRouter } from 'next/navigation';
-
 export default function Dashboard() {
 
   return (
