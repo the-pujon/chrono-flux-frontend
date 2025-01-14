@@ -15,18 +15,6 @@ import { useRouter } from 'next/navigation';
 
 export default function Dashboard() {
 
-  const user = useSelector((state: RootState) => state.auth.user);
-
-  // console.log(user)
-
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!user) {
-      // router.push('/auth/login');
-    }
-  }, [user, router]);
-
   return (
       <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950">
         <motion.div
