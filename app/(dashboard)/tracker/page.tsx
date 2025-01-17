@@ -7,6 +7,8 @@ import { GamificationDisplay } from '@/components/GamificationDisplay';
 import { UserChatHead } from '@/components/UserChatHead';
 import { TaskChatHead } from '@/components/TaskChatHead';
 import { motion } from 'framer-motion';
+
+
 export default function Dashboard() {
 
   return (
