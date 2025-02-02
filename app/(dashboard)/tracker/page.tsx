@@ -21,7 +21,7 @@ export default function Dashboard() {
           
         >
           <motion.h1
-            className="text-4xl font-bold text-center mb-8 text-indigo-800 dark:text-indigo-200"
+            className="text-5xl font-bold text-center mb-8 text-indigo-800 dark:text-indigo-200"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
